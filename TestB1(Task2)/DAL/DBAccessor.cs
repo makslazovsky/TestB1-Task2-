@@ -16,27 +16,27 @@ namespace TestB1_Task2_.DAL
             this.dbContextFactory = dbContextFactory;
         }
 
-        public Task<List<BalanceInfoRecord>> GetFileContent(int fileId)
+        public async Task<List<BalanceInfoRecord>> GetFileContent(int fileId)
         {
             using (var context = dbContextFactory.CreateDbContext())
             {
-                return context.FileRecords.AsNoTracking().Where(x => x.FileInfoId == fileId).ToListAsync();
+                return await context.FileRecords.AsNoTracking().Where(x => x.FileInfoId == fileId).ToListAsync();
             }
         }
 
-        public Task<BalanceInfoFile> GetFile(int fileId)
+        public async Task<BalanceInfoFile> GetFile(int fileId)
         {
             using (var context = dbContextFactory.CreateDbContext())
             {
-                return context.FileInfos.AsNoTracking().FirstOrDefaultAsync(x => x.Id == fileId);
+                return await context.FileInfos.AsNoTracking().FirstOrDefaultAsync(x => x.Id == fileId);
             }
         }
 
-        public Task<List<BalanceInfoFile>> GetFiles()
+        public async Task<List<BalanceInfoFile>> GetFiles()
         {
             using (var context = dbContextFactory.CreateDbContext())
             {
-                return context.FileInfos.AsNoTracking().ToListAsync();
+                return await context.FileInfos.AsNoTracking().ToListAsync();
             }
         }
 

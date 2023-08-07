@@ -14,6 +14,8 @@ namespace TestB1_Task2_
     {
         private IDBAccessor dbAccessor;
         ILog log;
+        // Номер строки, с которой начинаются данные
+        const int startRowNumber = 10;
 
         public FileManagmentService(IDBAccessor dbAccessor, ILog log)
         {
@@ -22,19 +24,20 @@ namespace TestB1_Task2_
             this.log = log;
         }
 
-        public Task<List<BalanceInfoFile>> GetFiles()
+        public async Task<List<BalanceInfoFile>> GetFiles()
         {
-            return dbAccessor.GetFiles();
+            var list = await dbAccessor.GetFiles();
+            return list;
         }
         public Task<BalanceInfoFile> GetFile(int fileId)
         {
+            
             return dbAccessor.GetFile(fileId);
         }
 
         public async Task<List<BalanceInfoRecord>> GetFileContent(int fileId)
         {
-            var records =  await dbAccessor.GetFileContent(fileId);
-            return records.OrderBy(x => x.AccountNumber).ToList();
+            return await dbAccessor.GetFileContent(fileId);
         }
 
         public async Task UploadFile(string filePath)
@@ -52,20 +55,9 @@ namespace TestB1_Task2_
                         // Перемещение к нужному листу
                         reader.Read();
 
-                        // Номер строки, с которой начинаются данные
-                        int startRowNumber = 10;
-
                         int currentRowNumber = 0;
 
                         fileInfo.FileName = Path.GetFileName(filePath);
-                        //TODO:
-
-                        //// Чтение данных из Excel и сохранение в таблицу DataTable
-                        //DataTable dataTable = new DataTable();
-                        //for (int i = 0; i < 8; i++)
-                        //{
-                        //    dataTable.Columns.Add();
-                        //}
 
                         while (reader.Read())
                         {
@@ -86,25 +78,11 @@ namespace TestB1_Task2_
                                 catch (Exception)
                                 {
                                 }
-                               
-                                //DataRow row = dataTable.NewRow();
-
-                                //for (int i = 0; i < 8; i++)
-                                //{
-                                //    row[i] = reader.GetValue(i);
-                                //}
-
-                                //dataTable.Rows.Add(row);
                             }
                             currentRowNumber++;
-
                         }
-
                         // Закрытие чтения файла Excel
                         reader.Close();
-
-                        //// Вставка в базу данных
-                        //await InsertDataAsync(filePath, dataTable);
                     }
 
                     await dbAccessor.UploadFile(fileInfo, fileRecords);

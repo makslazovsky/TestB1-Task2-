@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -100,10 +102,14 @@ namespace TestB1_Task2_
         private async void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // Получить выбранный элемент combobox
-            var selectedFileName = fileComboBox.SelectedItem as string;
-            var fileInfo = await fileManagmentService.GetFile(0); //TODO: pass id
-            var records = await fileManagmentService.GetFileContent(0); //TODO: pass id
-            BindFileInfoAsync(fileInfo, records);
+            var selectedFileInfo = fileComboBox.SelectedItem as BalanceInfoFile;
+            if (selectedFileInfo != null) 
+            {
+                var fileInfo = await fileManagmentService.GetFile(selectedFileInfo.Id); //TODO: pass id
+                var records = await fileManagmentService.GetFileContent(selectedFileInfo.Id); //TODO: pass id
+                BindFileInfoAsync(fileInfo, records);
+            }
+            
 
 
             //TODO: bind fileInfo + fileRecords to UI
@@ -142,24 +148,6 @@ namespace TestB1_Task2_
                     var records = await fileManagmentService.GetFileContent(fileinfo.Id);
                     BindFileInfoAsync(fileinfo, records);
                 }
-
-
-                //using (SqlConnection connection = new SqlConnection(connectionString))
-                //{
-                //    connection.Open();
-
-                //    SqlCommand command = new SqlCommand("SELECT FileName FROM FileTable", connection);
-                //    SqlDataReader reader = command.ExecuteReader();
-
-                //    List<string> fileList = new List<string>();
-
-                //    while (reader.Read())
-                //    {
-                //        fileList.Add(reader.GetString(0));
-                //    }
-
-                //    fileComboBox.ItemsSource = fileList;
-                //}
             }
             catch (Exception ex)
             {
@@ -169,7 +157,7 @@ namespace TestB1_Task2_
 
         private void BindFileInfoAsync(BalanceInfoFile info, List<BalanceInfoRecord> records)
         {
-            //TODO:
+            excelGrid.ItemsSource = records;
         }
 
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
