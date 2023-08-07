@@ -10,7 +10,6 @@ namespace TestB1_Task2_
 {
     public partial class MainWindow : Window, ILog
     {
-        string connectionString = "Data Source=.\\SQLEXPRESS;Initial Catalog=b1db;Integrated Security=True";
         IFilesDbContextFactory dbContextFactory;
         IDBAccessor dbAccessor;
         IFileManagmentService fileManagmentService;
@@ -18,7 +17,7 @@ namespace TestB1_Task2_
         public MainWindow()
         {
             InitializeComponent();
-            dbContextFactory = new FilesDbContextFactory(connectionString);
+            dbContextFactory = new FilesDbContextFactory();
             dbAccessor = new DBAccessor(dbContextFactory);
             fileManagmentService = new FileManagmentService(dbAccessor, this);
 
@@ -164,11 +163,11 @@ namespace TestB1_Task2_
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error loading file list: " + ex.Message);
+                ShowError("Error loading file list: " + ex.Message);
             }
         }
 
-        private void BindFileInfoAsync(FileInfo info, List<FileRecord> records)
+        private void BindFileInfoAsync(BalanceInfoFile info, List<BalanceInfoRecord> records)
         {
             //TODO:
         }
@@ -180,6 +179,7 @@ namespace TestB1_Task2_
 
         public void ShowError(string info)
         {
+            MessageBox.Show(info);
             //TODO: show dialog box
         }
     }

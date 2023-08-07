@@ -9,9 +9,9 @@ namespace TestB1_Task2_.DAL
 {
     public interface IDBAccessor
     {
-        Task<List<FileInfo>> GetFiles();
-        Task<FileInfo> GetFile(int fileId);
-        Task<List<FileRecord>> GetFileContent(int fileId);
-        Task UploadFile(FileInfo fileInfo, List<FileRecord> records);
+        Task<List<BalanceInfoFile>> GetFiles();
+        Task<BalanceInfoFile> GetFile(int fileId);
+        Task<List<BalanceInfoRecord>> GetFileContent(int fileId);
+        Task UploadFile(BalanceInfoFile fileInfo, List<BalanceInfoRecord> records);
     }
 }

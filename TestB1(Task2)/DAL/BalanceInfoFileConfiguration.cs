@@ -4,9 +4,9 @@ using TestB1_Task2_.Models;
 
 namespace TestB1_Task2_.DAL
 {
-    public class FileInfoConfiguration : IEntityTypeConfiguration<FileInfo>
+    public class BalanceInfoFileConfiguration : IEntityTypeConfiguration<BalanceInfoFile>
     {
-        public void Configure(EntityTypeBuilder<FileInfo> builder)
+        public void Configure(EntityTypeBuilder<BalanceInfoFile> builder)
         {
             builder.HasKey(p => p.Id);
         }

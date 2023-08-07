@@ -6,16 +6,16 @@ namespace TestB1_Task2_.DAL
 {
     public class FilesDbContext: DbContext
     {
-        public DbSet<FileInfo> FileInfos { get; set; }
-        public DbSet<FileRecord> FileRecords { get; set; }
+        public DbSet<BalanceInfoFile> FileInfos { get; set; }
+        public DbSet<BalanceInfoRecord> FileRecords { get; set; }
 
         public FilesDbContext(DbContextOptions options) : base(options) { }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new FileInfoConfiguration());
-            modelBuilder.ApplyConfiguration(new FileRecordConfiguration());
+            modelBuilder.ApplyConfiguration(new BalanceInfoFileConfiguration());
+            modelBuilder.ApplyConfiguration(new BalanceInfoRecordConfiguration());
         }
     }
 }

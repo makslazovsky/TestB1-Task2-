@@ -9,9 +9,9 @@ namespace TestB1_Task2_
 {
     public interface IFileManagmentService
     {
-        Task<List<FileInfo>> GetFiles();
-        Task<FileInfo> GetFile(int fileId);
-        Task<List<FileRecord>> GetFileContent(int fileId);
+        Task<List<BalanceInfoFile>> GetFiles();
+        Task<BalanceInfoFile> GetFile(int fileId);
+        Task<List<BalanceInfoRecord>> GetFileContent(int fileId);
         Task UploadFile(string filePath);
     }
 }

@@ -16,15 +16,15 @@ namespace TestB1_Task2_.DAL
             this.dbContextFactory = dbContextFactory;
         }
 
-        public Task<List<FileRecord>> GetFileContent(int fileId)
+        public Task<List<BalanceInfoRecord>> GetFileContent(int fileId)
         {
             using (var context = dbContextFactory.CreateDbContext())
             {
-                return context.FileRecords.AsNoTracking().Where(x => x.FileId == fileId).ToListAsync();
+                return context.FileRecords.AsNoTracking().Where(x => x.FileInfoId == fileId).ToListAsync();
             }
         }
 
-        public Task<FileInfo> GetFile(int fileId)
+        public Task<BalanceInfoFile> GetFile(int fileId)
         {
             using (var context = dbContextFactory.CreateDbContext())
             {
@@ -32,7 +32,7 @@ namespace TestB1_Task2_.DAL
             }
         }
 
-        public Task<List<FileInfo>> GetFiles()
+        public Task<List<BalanceInfoFile>> GetFiles()
         {
             using (var context = dbContextFactory.CreateDbContext())
             {
@@ -40,16 +40,16 @@ namespace TestB1_Task2_.DAL
             }
         }
 
-        public async Task UploadFile(FileInfo fileInfo, List<FileRecord> records)
+        public async Task UploadFile(BalanceInfoFile fileInfo, List<BalanceInfoRecord> records)
         {
             using (var context = dbContextFactory.CreateDbContext())
             {
                 var proxyFileInfo = context.FileInfos.Add(fileInfo).Entity;
-
+                await context.SaveChangesAsync();
                 foreach(var record in records)
                 {
-                    record.FileId = proxyFileInfo.Id;
-                    fileInfo.Records.Add(record);
+                    record.FileInfoId = proxyFileInfo.Id;
+                    context.FileRecords.Add(record);
                 }
 
                 await context.SaveChangesAsync();

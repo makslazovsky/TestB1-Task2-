@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TestB1_Task2_.DAL;
 using TestB1_Task2_.Models;
-using FileInfo = TestB1_Task2_.Models.FileInfo;
+using BalanceInfoFile = TestB1_Task2_.Models.BalanceInfoFile;
 
 namespace TestB1_Task2_
 {
@@ -22,16 +22,16 @@ namespace TestB1_Task2_
             this.log = log;
         }
 
-        public Task<List<FileInfo>> GetFiles()
+        public Task<List<BalanceInfoFile>> GetFiles()
         {
             return dbAccessor.GetFiles();
         }
-        public Task<FileInfo> GetFile(int fileId)
+        public Task<BalanceInfoFile> GetFile(int fileId)
         {
             return dbAccessor.GetFile(fileId);
         }
 
-        public async Task<List<FileRecord>> GetFileContent(int fileId)
+        public async Task<List<BalanceInfoRecord>> GetFileContent(int fileId)
         {
             var records =  await dbAccessor.GetFileContent(fileId);
             return records.OrderBy(x => x.AccountNumber).ToList();
@@ -44,8 +44,8 @@ namespace TestB1_Task2_
                 // Чтение данных из файла Excel
                 using (var stream = File.Open(filePath, FileMode.Open, FileAccess.Read))
                 {
-                    FileInfo fileInfo = null;
-                    List<FileRecord> fileRecords = null;
+                    BalanceInfoFile fileInfo = new BalanceInfoFile();
+                    List<BalanceInfoRecord> fileRecords = new List<BalanceInfoRecord>();
 
                     using (var reader = ExcelReaderFactory.CreateReader(stream))
                     {
@@ -57,6 +57,7 @@ namespace TestB1_Task2_
 
                         int currentRowNumber = 0;
 
+                        fileInfo.FileName = Path.GetFileName(filePath);
                         //TODO:
 
                         //// Чтение данных из Excel и сохранение в таблицу DataTable
@@ -70,6 +71,22 @@ namespace TestB1_Task2_
                         {
                             if (currentRowNumber >= startRowNumber)
                             {
+                                try
+                                {
+                                    BalanceInfoRecord infoRecord = new BalanceInfoRecord();
+                                    infoRecord.AccountNumber = Convert.ToString(reader.GetValue(0));
+                                    infoRecord.OpeningBalanceAsset = Convert.ToDecimal(reader.GetValue(1));
+                                    infoRecord.OpeningBalanceLiability = Convert.ToDecimal(reader.GetValue(2));
+                                    infoRecord.DebitTurnover = Convert.ToDecimal(reader.GetValue(3));
+                                    infoRecord.CreditTurnover = Convert.ToDecimal(reader.GetValue(4));
+                                    infoRecord.ClosingBalanceAsset = Convert.ToDecimal(reader.GetValue(5));
+                                    infoRecord.ClosingBalanceLiability = Convert.ToDecimal(reader.GetValue(6));
+                                    fileRecords.Add(infoRecord);
+                                }
+                                catch (Exception)
+                                {
+                                }
+                               
                                 //DataRow row = dataTable.NewRow();
 
                                 //for (int i = 0; i < 8; i++)
@@ -95,7 +112,7 @@ namespace TestB1_Task2_
             }
             catch (Exception ex)
             {
-                log.ShowError("Произошла ошибка при загрузке файла: " + ex.Message);
+                log.ShowError(ex.ToString());
             }
         }
     }
