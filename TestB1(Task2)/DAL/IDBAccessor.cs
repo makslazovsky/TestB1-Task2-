@@ -11,6 +11,7 @@ namespace TestB1_Task2_.DAL
     {
         Task<List<BalanceInfoFile>> GetFiles();
         Task<BalanceInfoFile> GetFile(int fileId);
+        BalanceInfoFile GetFileByName(string fileName);
         Task<List<BalanceInfoRecord>> GetFileContent(int fileId);
         Task UploadFile(BalanceInfoFile fileInfo, List<BalanceInfoRecord> records);
     }

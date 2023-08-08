@@ -32,6 +32,15 @@ namespace TestB1_Task2_.DAL
             }
         }
 
+        public BalanceInfoFile GetFileByName(string fileName)
+        {
+            using (var context = dbContextFactory.CreateDbContext())
+            {
+                var test = context.FileInfos.AsNoTracking().FirstOrDefault(x => x.FileName == fileName);
+                return test;
+            }
+        }
+
         public async Task<List<BalanceInfoFile>> GetFiles()
         {
             using (var context = dbContextFactory.CreateDbContext())
@@ -46,7 +55,8 @@ namespace TestB1_Task2_.DAL
             {
                 var proxyFileInfo = context.FileInfos.Add(fileInfo).Entity;
                 await context.SaveChangesAsync();
-                foreach(var record in records)
+
+                foreach (var record in records)
                 {
                     record.FileInfoId = proxyFileInfo.Id;
                     context.FileRecords.Add(record);

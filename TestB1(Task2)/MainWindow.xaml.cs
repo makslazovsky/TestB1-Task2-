@@ -37,127 +37,57 @@ namespace TestB1_Task2_
                 await fileManagmentService.UploadFile(filePath);
             }
         }
-        //private async Task InsertDataAsync(string filePath, DataTable dataTable)
-        //{
-        //    using (SqlConnection connection = new SqlConnection(connectionString))
-        //    {
-        //        await connection.OpenAsync();
 
-        //        // Вставка данных в таблицу FileTable
-        //        SqlCommand selectMaxFileCommand = new SqlCommand("SELECT MAX(Id) FROM FileTable", connection);
-        //        int maxFileId = (int)selectMaxFileCommand.ExecuteScalar() + 1;
-
-        //        string fileName = Path.GetFileNameWithoutExtension(filePath);
-        //        SqlCommand insertFileCommand = new SqlCommand("INSERT INTO FileTable (Id, FileName) VALUES (@Id, @FileName)", connection);
-        //        insertFileCommand.Parameters.AddWithValue("@Id", maxFileId);
-        //        insertFileCommand.Parameters.AddWithValue("@FileName", fileName);
-        //        await insertFileCommand.ExecuteNonQueryAsync();
-
-        //        int id = 0;
-        //        // Вставка данных из DataTable в базу данных MSSQL
-        //        SqlCommand selectMaxCommand = new SqlCommand("SELECT MAX(Id) FROM FileTable ", connection);
-        //        int maxId = (int)selectMaxCommand.ExecuteScalar() + 1;
-        //        id = maxId;
-
-        //        foreach (DataRow row in dataTable.Rows)
-        //        {
-        //            try
-        //            {
-
-        //                string accountNumber = row[0].ToString();
-        //                decimal openingBalanceAsset = decimal.Parse(row[1].ToString());
-        //                decimal openingBalanceLiability = decimal.Parse(row[2].ToString());
-        //                decimal debitTurnover = decimal.Parse(row[3].ToString());
-        //                decimal creditTurnover = decimal.Parse(row[4].ToString());
-        //                decimal closingBalanceAsset = decimal.Parse(row[5].ToString());
-        //                decimal closingBalanceLiability = decimal.Parse(row[6].ToString());
-
-        //                // Вставка данных в таблицу BalanceResult
-        //                SqlCommand insertCommand = new SqlCommand("INSERT INTO BalanceResult (Id, AccountNumber, OpeningBalanceAsset, OpeningBalanceLiability, DebitTurnover, CreditTurnover, ClosingBalanceAsset, ClosingBalanceLiability, FileID) " +
-        //                                                                             "VALUES (@Id, @AccountNumber, @OpeningBalanceAsset, @OpeningBalanceLiability, @DebitTurnover, @CreditTurnover, @ClosingBalanceAsset, @ClosingBalanceLiability, @FileID)", connection);
-        //                insertCommand.Parameters.AddWithValue("@Id", id);
-        //                insertCommand.Parameters.AddWithValue("@AccountNumber", accountNumber);
-        //                insertCommand.Parameters.AddWithValue("@OpeningBalanceAsset", openingBalanceAsset);
-        //                insertCommand.Parameters.AddWithValue("@OpeningBalanceLiability", openingBalanceLiability);
-        //                insertCommand.Parameters.AddWithValue("@DebitTurnover", debitTurnover);
-        //                insertCommand.Parameters.AddWithValue("@CreditTurnover", creditTurnover);
-        //                insertCommand.Parameters.AddWithValue("@ClosingBalanceAsset", closingBalanceAsset);
-        //                insertCommand.Parameters.AddWithValue("@ClosingBalanceLiability", closingBalanceLiability);
-        //                insertCommand.Parameters.AddWithValue("@FileID", maxFileId);
-        //                await insertCommand.ExecuteNonQueryAsync();
-        //                id++;
-        //            }
-        //            catch (Exception)
-        //            {
-        //            }
-
-        //        }
-
-        //        // Закрытие соединения с базой данных
-        //        await connection.CloseAsync();
-
-        //        MessageBox.Show("Файл успешно загружен в базу данных.");
-        //    }
-        //}
         private async void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // Получить выбранный элемент combobox
-            var selectedFileInfo = fileComboBox.SelectedItem as BalanceInfoFile;
-            if (selectedFileInfo != null) 
+            //var selectedFileInfo = fileComboBox.SelectedItem as BalanceInfoFile;
+            var selectedFileInfo = fileManagmentService.GetFileByName(fileComboBox.SelectedItem.ToString());
+            if (selectedFileInfo != null)
             {
-                var fileInfo = await fileManagmentService.GetFile(selectedFileInfo.Id); //TODO: pass id
-                var records = await fileManagmentService.GetFileContent(selectedFileInfo.Id); //TODO: pass id
-                BindFileInfoAsync(fileInfo, records);
+                try
+                {
+                    var fileInfo = await fileManagmentService.GetFile(selectedFileInfo.Id);
+                    var rootRecord = await fileManagmentService.GetRootRecordOfFileContent(selectedFileInfo.Id);
+                    BindFileInfoAsync(fileInfo, rootRecord);
+                }
+                catch (Exception ex)
+                {
+                    ShowError("Ошибка при смене файла: " + ex.Message);
+                }
             }
-            
-
-
-            //TODO: bind fileInfo + fileRecords to UI
-            //excelGrid.ItemsSource = dataTable.DefaultView;
-
-            // Подключиться к базе данных
-            //using (SqlConnection connection = new SqlConnection(connectionString))
-            //{
-            //    connection.Open();
-            //    string query = "SELECT ID FROM FileTable WHERE FileName = @FileName";
-            //    SqlCommand scalarCommand = new SqlCommand(query, connection);
-            //    scalarCommand.Parameters.AddWithValue("@FileName", selectedFileName);
-            //    int idFile = (int)scalarCommand.ExecuteScalar();
-
-            //    SqlCommand command = new SqlCommand($"SELECT AccountNumber, OpeningBalanceAsset, OpeningBalanceLiability, DebitTurnover, CreditTurnover, ClosingBalanceAsset, ClosingBalanceLiability FROM BalanceResult  WHERE FileID = {idFile}", connection); 
-
-            //    SqlDataAdapter adapter = new SqlDataAdapter(command);
-            //    DataTable dataTable = new DataTable();
-            //    adapter.Fill(dataTable);
-
-            //    excelGrid.ItemsSource = dataTable.DefaultView;
-            //}
         }
         private async void LoadFileList()
         {
             try
             {
                 var fileInfos = await fileManagmentService.GetFiles();
-                //TODO: bind to fileComboBox
-                fileComboBox.ItemsSource = fileInfos;
+                List<string> files = new List<string>();
+                foreach (var file in fileInfos)
+                {
+                    files.Add(file.FileName);
+                }
+                fileComboBox.ItemsSource = files;
 
-                //TODO: get curently selected item and bind it
+                //fileComboBox.ItemsSource = fileInfos;
+
+                //Получить корневой элемент для отображения
                 var fileinfo = fileInfos.FirstOrDefault();
                 if (fileinfo != null)
                 {
-                    var records = await fileManagmentService.GetFileContent(fileinfo.Id);
-                    BindFileInfoAsync(fileinfo, records);
+                    var record = await fileManagmentService.GetRootRecordOfFileContent(fileinfo.Id);
+                    BindFileInfoAsync(fileinfo, record);
                 }
             }
             catch (Exception ex)
             {
-                ShowError("Error loading file list: " + ex.Message);
+                ShowError("Ошибка при загрузке списка файлов: " + ex.Message);
             }
         }
 
-        private void BindFileInfoAsync(BalanceInfoFile info, List<BalanceInfoRecord> records)
+        private void BindFileInfoAsync(BalanceInfoFile info, BalanceInfoRecord rootRecord)
         {
-            excelGrid.ItemsSource = records;
+            excelGrid.ItemsSource = new[] { rootRecord };
         }
 
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
@@ -168,7 +98,6 @@ namespace TestB1_Task2_
         public void ShowError(string info)
         {
             MessageBox.Show(info);
-            //TODO: show dialog box
         }
     }
 

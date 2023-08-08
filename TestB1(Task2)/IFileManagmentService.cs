@@ -11,7 +11,8 @@ namespace TestB1_Task2_
     {
         Task<List<BalanceInfoFile>> GetFiles();
         Task<BalanceInfoFile> GetFile(int fileId);
-        Task<List<BalanceInfoRecord>> GetFileContent(int fileId);
+        BalanceInfoFile GetFileByName(string fileName);
+        Task<BalanceInfoRecord> GetRootRecordOfFileContent(int fileId);
         Task UploadFile(string filePath);
     }
 }

@@ -29,7 +29,10 @@ namespace TestB1_Task2_.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Level = table.Column<int>(type: "int", nullable: false),
+                    AccountNumber = table.Column<int>(type: "int", nullable: false),
+                    ParentAccountNumber = table.Column<int>(type: "int", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OpeningBalanceAsset = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     OpeningBalanceLiability = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DebitTurnover = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
